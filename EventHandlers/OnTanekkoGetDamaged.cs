@@ -44,8 +44,11 @@ namespace EventHandlers
                     _tanekkoModel.DecreaseLifeCount();
                     if (_tanekkoModel.LifeCount > 0)
                     {
-                        _tanekkoModel.SetInvincibleTickCount(50);
+                        _tanekkoModel.SetInvincibleTickCount(300);
+                        _tanekkoModel.SetMotionStatus(TanekkoMotionStatus.Damaged);
                         _tanekkoBody.DrawEffectToGetDamaged();
+
+                        _tanekko.KnockBack(_tanekkoModel.LookDirection);
                     }
                     else
                     {

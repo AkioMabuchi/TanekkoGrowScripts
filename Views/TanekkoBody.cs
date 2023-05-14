@@ -19,6 +19,7 @@ namespace Views
         private TanekkoElementStatus _currentElementStatus = TanekkoElementStatus.Normal;
 
         private Coroutine _coroutineMotion;
+        private Coroutine _coroutineColor;
         private Tweener _tweenerColor;
 
         private TanekkoBodySpritesGroup _currentSpritesGroup;
@@ -79,9 +80,14 @@ namespace Views
                     _coroutineMotion = StartCoroutine(CoroutineMotionAbsorbing());
                     break;
                 }
+                case TanekkoMotionStatus.Damaged:
+                {
+                    _coroutineMotion = StartCoroutine(CoroutineMotionDamaged());
+                    break;
+                }
                 case TanekkoMotionStatus.Defeated:
                 {
-                    _coroutineMotion = StartCoroutine(CoroutineMotionIdle());
+                    _coroutineMotion = StartCoroutine(CoroutineMotionDamaged());
                     break;
                 }
                 case TanekkoMotionStatus.TimeUp:
@@ -118,18 +124,43 @@ namespace Views
         public void ResetSpriteColor()
         {
             _tweenerColor?.Kill();
+            if (_coroutineColor!=null)
+            {
+                StopCoroutine(_coroutineColor);
+            }
             spriteRenderer.color = Color.white;
         }
         public void DrawEffectToGetDamaged()
         {
             _tweenerColor?.Kill();
-            _tweenerColor = spriteRenderer.DOColor(Color.white, 1.0f).From(colorDamaged).SetLink(gameObject);
+            if (_coroutineColor!=null)
+            {
+                StopCoroutine(_coroutineColor);
+            }
+
+            _coroutineColor = StartCoroutine(CoroutineEffectGetDamaged());
         }
 
+        private IEnumerator CoroutineEffectGetDamaged()
+        {
+            for (var i = 0; i < 60; i++)
+            {
+                spriteRenderer.color = Color.clear;
+                yield return new WaitForSeconds(0.025f);
+                spriteRenderer.color = Color.white;
+                yield return new WaitForSeconds(0.025f);
+            }
+
+            spriteRenderer.color = Color.white;
+        }
         public void DrawEffectToGetDefeated()
         {
             _tweenerColor?.Kill();
-            _tweenerColor = spriteRenderer.DOColor(new Color(1.0f, 1.0f, 1.0f, 0.0f), 1.0f).From(Color.white)
+            if (_coroutineColor!=null)
+            {
+                StopCoroutine(_coroutineColor);
+            }
+            _tweenerColor = spriteRenderer.DOColor(new Color(1.0f, 1.0f, 1.0f, 0.0f), 0.2f).From(Color.white)
                 .SetLink(gameObject);
         }
 
@@ -235,6 +266,12 @@ namespace Views
             spriteRenderer.sprite = _currentSpritesGroup.spriteAbsorbingD;
             yield return new WaitForSeconds(0.5f);
             spriteRenderer.sprite = _currentSpritesGroup.spriteAbsorbingE;
+        }
+
+        private IEnumerator CoroutineMotionDamaged()
+        {
+            spriteRenderer.sprite = _currentSpritesGroup.spriteDamaged;
+            yield break;
         }
     }
 }

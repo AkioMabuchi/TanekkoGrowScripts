@@ -1,4 +1,5 @@
 using System;
+using Enums;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
@@ -13,7 +14,10 @@ namespace Views
         [SerializeField] private float jumpPower;
         [SerializeField] private float moveSpeed;
         [SerializeField] private Vector3 initialPosition;
-    
+
+        [SerializeField] private Vector2 knockBackVelocityLeft;
+        [SerializeField] private Vector2 knockBackVelocityRight;
+        
         private readonly Subject<Unit> _subjectOnDamaged = new();
         public IObservable<Unit> OnDamaged => _subjectOnDamaged;
         private void Reset()
@@ -66,6 +70,15 @@ namespace Views
             rigidbody2d.velocity = velocity;
         }
 
+        public void KnockBack(TanekkoLookDirection tanekkoLookDirection)
+        {
+            rigidbody2d.velocity = tanekkoLookDirection switch
+            {
+                TanekkoLookDirection.Right => knockBackVelocityRight,
+                TanekkoLookDirection.Left => knockBackVelocityLeft,
+                _ => Vector2.zero
+            };
+        }
         public void Stop()
         {
             rigidbody2d.velocity = Vector2.zero;

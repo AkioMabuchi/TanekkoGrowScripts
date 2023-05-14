@@ -8,6 +8,7 @@ namespace Enums
         Jumping,
         Attacking,
         Absorbing,
+        Damaged,
         Defeated,
         TimeUp,
         Goal
